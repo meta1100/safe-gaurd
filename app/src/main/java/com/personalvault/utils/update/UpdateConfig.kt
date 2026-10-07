@@ -2,11 +2,10 @@ package com.personalvault.utils.update
 
 /**
  * Official GitHub repository configuration for PersonalVault releases and update checking.
- * Replace [GITHUB_OWNER] with your actual GitHub username or organization name.
  */
 object UpdateConfig {
-    const val GITHUB_OWNER = "mdsaif2022"
-    const val GITHUB_REPO = "SAFE GAURD"
+    const val GITHUB_OWNER = "meta1100"
+    const val GITHUB_REPO = "safe-gaurd"
 
     val RELEASES_API_URL: String
         get() = "https://api.github.com/repos/$GITHUB_OWNER/$GITHUB_REPO/releases/latest"
