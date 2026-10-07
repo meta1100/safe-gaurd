@@ -46,7 +46,7 @@ jobs:
             echo "$KEYSTORE_BASE64" | base64 --decode > app/release.keystore
             echo "Keystore decoded successfully."
           else
-            echo "No KEYSTORE_BASE64 secret provided. Proceeding with default build."
+            echo "No KEYSTORE_BASE64 secret provided. Building unsigned release APK."
           fi
 
       - name: Build Release APK
@@ -57,7 +57,14 @@ jobs:
       - name: Prepare APK Asset
         run: |
           TAG_NAME="${GITHUB_REF_NAME:-v1.0.0}"
-          cp app/build/outputs/apk/release/app-release.apk "PersonalVault-${TAG_NAME}.apk"
+          APK_FILE=$(find app/build/outputs/apk/release/ -name "*.apk" | head -n 1)
+          if [ -n "$APK_FILE" ]; then
+            echo "Found generated APK: $APK_FILE"
+            cp "$APK_FILE" "PersonalVault-${TAG_NAME}.apk"
+          else
+            echo "Error: No APK found in release directory."
+            exit 1
+          fi
 
       - name: Create GitHub Release & Upload APK Asset
         uses: softprops/action-gh-release@v2
