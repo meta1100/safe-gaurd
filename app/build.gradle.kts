@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.personalvault"
-    compileSdk = 37
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.personalvault"
         minSdk = 24
-        targetSdk = 37
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
 
@@ -27,14 +27,17 @@ android {
                 storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
                 keyAlias = System.getenv("KEY_ALIAS") ?: ""
                 keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+                enableV1Signing = true
+                enableV2Signing = true
             } else {
-                // Fallback signing config ensures generated APK is signed and installable
                 val debugKeystore = file("${System.getProperty("user.home")}/.android/debug.keystore")
                 if (debugKeystore.exists()) {
                     storeFile = debugKeystore
                     storePassword = "android"
                     keyAlias = "androiddebugkey"
                     keyPassword = "android"
+                    enableV1Signing = true
+                    enableV2Signing = true
                 }
             }
         }
