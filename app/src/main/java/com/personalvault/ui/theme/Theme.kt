@@ -12,7 +12,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -57,7 +56,7 @@ private fun Context.findActivity(): Activity? {
 @Composable
 fun PersonalVaultTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Set false to maintain consistent personal vault branding
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -74,8 +73,10 @@ fun PersonalVaultTheme(
         SideEffect {
             val activity = view.context.findActivity()
             if (activity != null) {
-                activity.window.statusBarColor = colorScheme.background.toArgb()
-                WindowCompat.getInsetsController(activity.window, view).isAppearanceLightStatusBars = !darkTheme
+                try {
+                    WindowCompat.getInsetsController(activity.window, view).isAppearanceLightStatusBars = !darkTheme
+                } catch (_: Exception) {
+                }
             }
         }
     }
