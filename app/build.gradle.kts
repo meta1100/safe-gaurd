@@ -24,21 +24,15 @@ android {
             val keystoreFile = file(keystorePath)
             if (keystoreFile.exists()) {
                 storeFile = keystoreFile
-                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
-                keyAlias = System.getenv("KEY_ALIAS") ?: ""
-                keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+                val envStorePass = System.getenv("KEYSTORE_PASSWORD")
+                val envAlias = System.getenv("KEY_ALIAS")
+                val envKeyPass = System.getenv("KEY_PASSWORD")
+
+                storePassword = if (!envStorePass.isNullOrEmpty()) envStorePass else "android"
+                keyAlias = if (!envAlias.isNullOrEmpty()) envAlias else "personalvault"
+                keyPassword = if (!envKeyPass.isNullOrEmpty()) envKeyPass else "android"
                 enableV1Signing = true
                 enableV2Signing = true
-            } else {
-                val debugKeystore = file("${System.getProperty("user.home")}/.android/debug.keystore")
-                if (debugKeystore.exists()) {
-                    storeFile = debugKeystore
-                    storePassword = "android"
-                    keyAlias = "androiddebugkey"
-                    keyPassword = "android"
-                    enableV1Signing = true
-                    enableV2Signing = true
-                }
             }
         }
     }
@@ -46,7 +40,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            val relConfig = signingConfigs.findByName("release")
+            if (relConfig?.storeFile?.exists() == true) {
+                signingConfig = relConfig
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

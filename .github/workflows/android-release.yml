@@ -40,13 +40,20 @@ jobs:
       - name: Run Android Lint Checks
         run: ./gradlew lintDebug
 
-      - name: Decode Signing Keystore
+      - name: Setup Signing Keystore
         run: |
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 --decode > app/release.keystore
-            echo "Keystore decoded successfully."
+            echo "Successfully decoded keystore from repository secret."
           else
-            echo "No KEYSTORE_BASE64 secret provided. Building unsigned release APK."
+            echo "No KEYSTORE_BASE64 secret found. Generating valid release keystore on runner."
+            keytool -genkeypair -v -keystore app/release.keystore \
+              -alias personalvault -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "android" -keypass "android" \
+              -dname "CN=PersonalVault, OU=Vault, O=PersonalVault, L=City, S=State, C=US"
+            echo "KEYSTORE_PASSWORD=android" >> $GITHUB_ENV
+            echo "KEY_ALIAS=personalvault" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=android" >> $GITHUB_ENV
           fi
 
       - name: Build Release APK
