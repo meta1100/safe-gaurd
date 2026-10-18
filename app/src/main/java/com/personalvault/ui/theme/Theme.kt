@@ -1,6 +1,8 @@
 package com.personalvault.ui.theme
 
 import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +45,15 @@ private val LightColorScheme = lightColorScheme(
     outline = VaultLightBorder
 )
 
+private fun Context.findActivity(): Activity? {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    return null
+}
+
 @Composable
 fun PersonalVaultTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -61,9 +72,11 @@ fun PersonalVaultTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            val activity = view.context.findActivity()
+            if (activity != null) {
+                activity.window.statusBarColor = colorScheme.background.toArgb()
+                WindowCompat.getInsetsController(activity.window, view).isAppearanceLightStatusBars = !darkTheme
+            }
         }
     }
 
