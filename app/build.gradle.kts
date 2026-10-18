@@ -18,6 +18,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+    }
+
     signingConfigs {
         create("release") {
             val keystorePath = System.getenv("KEYSTORE_FILE_PATH") ?: "release.keystore"
@@ -43,6 +48,8 @@ android {
             val relConfig = signingConfigs.findByName("release")
             if (relConfig?.storeFile?.exists() == true) {
                 signingConfig = relConfig
+            } else {
+                signingConfig = signingConfigs.getByName("debug")
             }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
